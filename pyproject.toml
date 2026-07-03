@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools==75.6.0", "wheel==0.45.1", "Cython==3.0.11"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "garment-deal-finder"
+version = "0.1.0"
+description = "Production-style garment deal finder with FastAPI, NiceGUI, PostgreSQL, Celery, and Cython scoring."
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi==0.115.6",
+  "uvicorn[standard]==0.32.1",
+  "nicegui==2.9.1",
+  "SQLAlchemy==2.0.36",
+  "alembic==1.14.0",
+  "asyncpg==0.30.0",
+  "aiosqlite==0.20.0",
+  "pydantic==2.10.3",
+  "pydantic-settings==2.6.1",
+  "httpx==0.28.1",
+  "beautifulsoup4==4.12.3",
+  "playwright==1.49.1",
+  "celery==5.4.0",
+  "redis==5.2.1",
+  "tenacity==9.0.0",
+  "structlog==24.4.0",
+  "python-dotenv==1.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "Cython==3.0.11",
+  "pytest==8.3.4",
+  "pytest-asyncio==0.24.0",
+  "pytest-cov==6.0.0",
+  "ruff==0.8.3",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.setuptools.package-data]
+"app.retailers" = ["fixtures/*.html"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
