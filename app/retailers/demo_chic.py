@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from bs4 import BeautifulSoup
 
-from app.core.brand_catalog import catalog_products_for_retailer, product_image_url, shopping_search_url
+from app.core.brand_catalog import catalog_products_for_retailer, product_detail_url, product_image_url
 from app.retailers.base import RetailerAdapter, ScrapeContext, ScrapedProduct
 from app.scoring import normalize_text
 
@@ -25,13 +25,16 @@ class DemoChicAdapter(RetailerAdapter):
         card = raw_product
         sizes = _csv(card.get("data-sizes", ""))
         colors = _csv(card.get("data-colors", ""))
+        title = _text(card, ".title")
+        brand = card.get("data-brand")
+        category = card.get("data-category")
         return ScrapedProduct(
             retailer=self.retailer_name,
             retailer_product_id=card.get("data-id"),
-            title=_text(card, ".title"),
+            title=title,
             description=_text(card, ".description") or None,
-            brand=card.get("data-brand"),
-            category=card.get("data-category"),
+            brand=brand,
+            category=category,
             available_sizes=sizes,
             colors=colors,
             material=card.get("data-material"),
@@ -40,8 +43,14 @@ class DemoChicAdapter(RetailerAdapter):
             sale_price=_decimal(card.get("data-sale-price")) or Decimal("0.00"),
             shipping_price=_decimal(card.get("data-shipping-price")),
             currency=card.get("data-currency", "USD"),
-            product_url=shopping_search_url(_text(card, ".title"), card.get("data-brand")),
-            image_url=product_image_url(card.get("data-category"), colors[0] if colors else None, card.get("data-brand"), _text(card, ".title")),
+            product_url=product_detail_url(
+                retailer_product_id=card.get("data-id") or "demo-chic-product",
+                title=title,
+                brand=brand,
+                category=category,
+                color=colors[0] if colors else None,
+            ),
+            image_url=product_image_url(category, colors[0] if colors else None, brand, title),
             in_stock=card.get("data-stock", "in").lower() == "in",
         )
 

@@ -11,9 +11,9 @@ from app.retailers.demo_outlet import DemoOutletAdapter
 from app.schemas.search import SearchCriteria
 
 
-def test_brand_catalog_contains_requested_50_brands() -> None:
-    assert len(BRAND_CATALOG) == 50 * PRODUCTS_PER_BRAND
-    assert len(set(BRAND_NAMES)) == 50
+def test_brand_catalog_contains_requested_60_brands() -> None:
+    assert len(BRAND_CATALOG) == 60 * PRODUCTS_PER_BRAND
+    assert len(set(BRAND_NAMES)) == 60
     assert Counter(item.brand for item in BRAND_CATALOG) == Counter({brand: PRODUCTS_PER_BRAND for brand in BRAND_NAMES})
     for brand in [
         "Zara",
@@ -24,6 +24,10 @@ def test_brand_catalog_contains_requested_50_brands() -> None:
         "Chanel",
         "Hermes",
         "Hugo Boss",
+        "Coach",
+        "Michael Kors",
+        "Alo Yoga",
+        "Dr. Martens",
     ]:
         assert brand in BRAND_NAMES
 
@@ -32,11 +36,12 @@ def test_catalog_is_split_across_two_demo_retailers() -> None:
     chic_products = catalog_products_for_retailer("Demo Chic", "demo-chic")
     outlet_products = catalog_products_for_retailer("Demo Outlet", "demo-outlet")
 
-    assert len(chic_products) == 750
-    assert len(outlet_products) == 750
+    assert len(chic_products) == 900
+    assert len(outlet_products) == 900
     assert {product.brand for product in chic_products + outlet_products} == set(BRAND_NAMES)
-    assert all(product.product_url.startswith("https://www.google.com/search?tbm=shop&q=") for product in chic_products)
-    assert all(product.product_url.startswith("https://www.google.com/search?tbm=shop&q=") for product in outlet_products)
+    assert all(product.product_url.startswith("/api/catalog-products/") for product in chic_products)
+    assert all(product.product_url.startswith("/api/catalog-products/") for product in outlet_products)
+    assert all("google.com/search" not in product.product_url for product in chic_products + outlet_products)
     assert all(product.image_url and product.image_url.startswith("/api/catalog-images/product.svg?") for product in chic_products)
     assert all(product.image_url and product.image_url.startswith("/api/catalog-images/product.svg?") for product in outlet_products)
 
@@ -59,6 +64,6 @@ async def test_demo_adapters_return_working_find_links_for_fixture_products() ->
     products = await DemoChicAdapter().search(SearchCriteria(search_phrase="Northline"), context)
 
     assert products
-    assert all("demo.local" not in product.product_url for product in products)
-    assert all(product.product_url.startswith("https://www.google.com/search?tbm=shop&q=") for product in products)
+    assert all(product.product_url.startswith("/api/catalog-products/") for product in products)
+    assert all("google.com/search" not in product.product_url for product in products)
     assert all(product.image_url and product.image_url.startswith("/api/catalog-images/product.svg?") for product in products)

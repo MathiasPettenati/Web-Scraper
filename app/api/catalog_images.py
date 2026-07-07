@@ -10,34 +10,36 @@ router = APIRouter()
 
 
 COLOR_HEX: dict[str, str] = {
-    "black": "#1f2328",
-    "blue": "#315f9c",
-    "brown": "#765236",
-    "camel": "#b88755",
-    "champagne": "#e1c8a0",
-    "charcoal": "#4b5563",
-    "cream": "#efe2c6",
-    "forest": "#315541",
-    "grey": "#8a9099",
-    "gray": "#8a9099",
-    "heather grey": "#a9adb3",
-    "honey": "#c9923c",
-    "indigo": "#263f75",
-    "ivory": "#f4ecd8",
-    "khaki": "#b8a06a",
-    "natural": "#d9caa4",
-    "navy": "#1f3358",
-    "oat": "#d7c7aa",
-    "olive": "#68734b",
-    "orange": "#d97706",
-    "rust": "#a4492d",
-    "sage": "#9aa98d",
-    "sand": "#cfb98f",
-    "sky": "#a8c8e8",
-    "stone": "#b8b2a4",
-    "volt": "#b6d629",
-    "washed black": "#313131",
-    "white": "#f8f6ee",
+    "black": "#64113f",
+    "blue": "#b83280",
+    "brown": "#a2412d",
+    "camel": "#ff9f1c",
+    "champagne": "#ffd08a",
+    "charcoal": "#7a174f",
+    "cream": "#ffd6a5",
+    "emerald": "#ff4fa3",
+    "forest": "#c64161",
+    "gray": "#ff7a45",
+    "grey": "#ff7a45",
+    "heather grey": "#ff9a76",
+    "honey": "#ff8c1a",
+    "indigo": "#8f1d64",
+    "ivory": "#ffe1b8",
+    "khaki": "#ffb347",
+    "natural": "#ffc675",
+    "navy": "#5d1049",
+    "oat": "#ffd7a8",
+    "olive": "#d85a3c",
+    "orange": "#ff7a00",
+    "rust": "#e94f37",
+    "sage": "#f06f7f",
+    "sand": "#ffb45f",
+    "sky": "#ff8ab3",
+    "stone": "#ffa66a",
+    "tan": "#ff9f3f",
+    "volt": "#ffcf33",
+    "washed black": "#7b174f",
+    "white": "#fff0d6",
 }
 
 
@@ -58,26 +60,29 @@ def render_product_svg(category: str, color: str, brand: str, title: str) -> str
     brand_label = escape((brand or "Deal Finder").strip()[:34])
     title_label = escape(_short_title(title or category or "Catalog product"))
     shape = _shape_for_category(category, fill, accent, title)
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 675" role="img" aria-label="{brand_label} {title_label}">
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" role="img" aria-label="{brand_label} {title_label} {category_label}">
   <defs>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#1f2937" flood-opacity="0.18"/>
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#4a0832" flood-opacity="0.24"/>
     </filter>
-    <linearGradient id="surface" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#fbfaf7"/>
-      <stop offset="1" stop-color="#ece7de"/>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#ff2da8"/>
+      <stop offset="0.52" stop-color="#ff7a18"/>
+      <stop offset="1" stop-color="#ffd36a"/>
+    </linearGradient>
+    <linearGradient id="warm-surface" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff2d6"/>
+      <stop offset="1" stop-color="#ffd1b8"/>
     </linearGradient>
   </defs>
-  <rect width="900" height="675" fill="url(#surface)"/>
-  <circle cx="720" cy="130" r="78" fill="{accent}" opacity="0.12"/>
-  <circle cx="150" cy="560" r="104" fill="{fill}" opacity="0.08"/>
+  <rect width="900" height="900" fill="url(#sky)"/>
+  <rect x="92" y="92" width="716" height="716" fill="url(#warm-surface)" stroke="#ff2da8" stroke-width="3"/>
   <g filter="url(#shadow)">
-    <rect x="185" y="72" width="530" height="458" rx="34" fill="#ffffff"/>
+    <rect x="185" y="168" width="530" height="530" fill="#fff3df"/>
+    <g transform="translate(0 94)">
     {shape}
+    </g>
   </g>
-  <text x="450" y="582" text-anchor="middle" fill="#111827" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="800">{brand_label}</text>
-  <text x="450" y="620" text-anchor="middle" fill="#4b5563" font-family="Inter, Arial, sans-serif" font-size="24">{title_label}</text>
-  <text x="450" y="650" text-anchor="middle" fill="#6b7280" font-family="Inter, Arial, sans-serif" font-size="17">{category_label}</text>
 </svg>"""
 
 
@@ -183,11 +188,11 @@ def _scarf_shape(fill: str, accent: str) -> str:
 
 def _color_hex(color: str) -> str:
     normalized = (color or "").strip().casefold()
-    return COLOR_HEX.get(normalized, "#315f9c")
+    return COLOR_HEX.get(normalized, "#ff7a18")
 
 
 def _accent_color(fill: str) -> str:
-    return "#d6a85f" if fill.lower() not in {"#f8f6ee", "#f4ecd8", "#efe2c6"} else "#315f9c"
+    return "#ff2da8" if fill.lower() not in {"#ff2da8", "#ff4fa3", "#fff0d6"} else "#ff7a18"
 
 
 def _short_title(title: str) -> str:

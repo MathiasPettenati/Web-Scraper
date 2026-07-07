@@ -82,6 +82,16 @@ REQUESTED_BRANDS: tuple[str, ...] = (
     "Prada",
     "Burberry",
     "Hugo Boss",
+    "Coach",
+    "Michael Kors",
+    "Kate Spade",
+    "Reformation",
+    "Everlane",
+    "Madewell",
+    "AllSaints",
+    "Alo Yoga",
+    "Fabletics",
+    "Dr. Martens",
 )
 
 
@@ -168,6 +178,16 @@ BRAND_PRICE_TIERS: dict[str, Decimal] = {
     "Louis Vuitton": Decimal("6.60"),
     "Chanel": Decimal("7.20"),
     "Hermes": Decimal("7.40"),
+    "Coach": Decimal("2.35"),
+    "Michael Kors": Decimal("2.45"),
+    "Kate Spade": Decimal("2.30"),
+    "Reformation": Decimal("1.85"),
+    "Everlane": Decimal("1.22"),
+    "Madewell": Decimal("1.28"),
+    "AllSaints": Decimal("1.82"),
+    "Alo Yoga": Decimal("1.72"),
+    "Fabletics": Decimal("1.05"),
+    "Dr. Martens": Decimal("1.48"),
 }
 
 
@@ -212,9 +232,10 @@ def _catalog_product(item: BrandCatalogItem, retailer_name: str, retailer_slug: 
     discount = _catalog_discount(item)
     sale_price = _money(original_price * (Decimal("1") - discount))
     shipping_price = _catalog_shipping(item)
+    retailer_product_id = f"{retailer_slug}-{item.index:04d}"
     return ScrapedProduct(
         retailer=retailer_name,
-        retailer_product_id=f"{retailer_slug}-{item.index:04d}",
+        retailer_product_id=retailer_product_id,
         title=item.title,
         description=(
             f"Sale deal listing for {item.brand} {item.category.lower()}; "
@@ -230,20 +251,41 @@ def _catalog_product(item: BrandCatalogItem, retailer_name: str, retailer_slug: 
         sale_price=sale_price,
         shipping_price=shipping_price,
         currency="USD",
-        product_url=shopping_search_url(item.title, item.brand),
+        product_url=product_detail_url(
+            retailer_product_id=retailer_product_id,
+            title=item.title,
+            brand=item.brand,
+            category=item.category,
+            color=item.colors[0],
+        ),
         image_url=product_image_url(item.category, item.colors[0], item.brand, item.title),
         in_stock=item.index % 17 != 0,
     )
 
 
+def product_detail_url(
+    *,
+    retailer_product_id: str,
+    title: str,
+    brand: str | None = None,
+    category: str | None = None,
+    color: str | None = None,
+) -> str:
+    slug = _slug(title)
+    query = {
+        "brand": brand or "",
+        "title": title,
+        "category": category or "",
+        "color": color or "",
+    }
+    query_string = "&".join(f"{key}={quote_plus(value)}" for key, value in query.items() if value)
+    suffix = f"?{query_string}" if query_string else ""
+    return f"/api/catalog-products/{retailer_product_id}-{slug}{suffix}"
+
+
 def shopping_search_url(title: str, brand: str | None = None) -> str:
-    title_text = title.strip()
-    brand_text = (brand or "").strip()
-    if brand_text and not title_text.casefold().startswith(brand_text.casefold()):
-        query = f"{brand_text} {title_text} sale deal"
-    else:
-        query = f"{title_text} sale deal"
-    return f"https://www.google.com/search?tbm=shop&q={quote_plus(query)}"
+    product_id = _slug(" ".join(part for part in [brand or "", title] if part))[:80] or "catalog-product"
+    return product_detail_url(retailer_product_id=product_id, title=title, brand=brand)
 
 
 def product_image_url(category: str | None, color: str | None, brand: str | None, title: str | None) -> str:
@@ -281,3 +323,16 @@ def _catalog_shipping(item: BrandCatalogItem) -> Decimal:
 
 def _money(value: int | Decimal) -> Decimal:
     return Decimal(value).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
+def _slug(value: str) -> str:
+    normalized = []
+    previous_dash = False
+    for character in value.casefold():
+        if character.isalnum():
+            normalized.append(character)
+            previous_dash = False
+        elif not previous_dash:
+            normalized.append("-")
+            previous_dash = True
+    return "".join(normalized).strip("-")

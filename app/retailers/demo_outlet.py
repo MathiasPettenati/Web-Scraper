@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from bs4 import BeautifulSoup
 
-from app.core.brand_catalog import catalog_products_for_retailer, product_image_url, shopping_search_url
+from app.core.brand_catalog import catalog_products_for_retailer, product_detail_url, product_image_url
 from app.retailers.base import RetailerAdapter, ScrapeContext, ScrapedProduct
 from app.scoring import normalize_text
 
@@ -26,27 +26,37 @@ class DemoOutletAdapter(RetailerAdapter):
     async def parse_product(self, raw_product: object) -> ScrapedProduct:
         product = raw_product["item"]
         offer = product["offers"]
+        title = product["name"]
+        brand = product.get("brand", {}).get("name")
+        category = product.get("category")
+        colors = product.get("color", [])
         return ScrapedProduct(
             retailer=self.retailer_name,
             retailer_product_id=product.get("sku"),
-            title=product["name"],
+            title=title,
             description=product.get("description"),
-            brand=product.get("brand", {}).get("name"),
-            category=product.get("category"),
+            brand=brand,
+            category=category,
             available_sizes=product.get("size", []),
-            colors=product.get("color", []),
+            colors=colors,
             material=product.get("material"),
             condition=product.get("itemCondition", "new").split("/")[-1].lower(),
             original_price=_maybe_decimal(product.get("highPrice")),
             sale_price=Decimal(str(offer["price"])),
             shipping_price=Decimal(str(offer.get("shippingDetails", {}).get("shippingRate", {}).get("value", 0))),
             currency=offer.get("priceCurrency", "USD"),
-            product_url=shopping_search_url(product["name"], product.get("brand", {}).get("name")),
+            product_url=product_detail_url(
+                retailer_product_id=product.get("sku") or "demo-outlet-product",
+                title=title,
+                brand=brand,
+                category=category,
+                color=(colors or [None])[0],
+            ),
             image_url=product_image_url(
-                product.get("category"),
-                (product.get("color") or [None])[0],
-                product.get("brand", {}).get("name"),
-                product["name"],
+                category,
+                (colors or [None])[0],
+                brand,
+                title,
             ),
             in_stock=offer.get("availability", "").endswith("InStock"),
         )

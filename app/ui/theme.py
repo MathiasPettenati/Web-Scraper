@@ -12,31 +12,34 @@ def apply_theme() -> None:
     ui.add_css(
         """
         :root {
-          --bg: #f6f3ee;
-          --surface: #ffffff;
-          --surface-2: #ece7de;
-          --ink: #171717;
-          --muted: #68645d;
-          --line: #d8d1c6;
-          --accent: #0f766e;
-          --accent-2: #1d4ed8;
-          --warn: #b45309;
-          --danger: #b91c1c;
+          --bg: #fff1d6;
+          --surface: #fff7e8;
+          --surface-2: #ffe0b8;
+          --ink: #3b071f;
+          --muted: #8a3d20;
+          --line: #ff9f1c;
+          --accent: #ff2da8;
+          --accent-2: #ff7a18;
+          --warn: #ff8a00;
+          --danger: #c7277a;
         }
         body.body--dark {
-          --bg: #121212;
-          --surface: #1f1f1f;
-          --surface-2: #2a2926;
-          --ink: #f5f5f0;
-          --muted: #b8b2a9;
-          --line: #3e3a35;
-          --accent: #2dd4bf;
-          --accent-2: #93c5fd;
-          --warn: #f59e0b;
-          --danger: #f87171;
+          --bg: #24001a;
+          --surface: #3b0628;
+          --surface-2: #270016;
+          --ink: #fff7ed;
+          --muted: #ffd6a5;
+          --line: #ff7a18;
+          --accent: #ff2da8;
+          --accent-2: #ff9f1c;
+          --warn: #ffb347;
+          --danger: #ff4fa3;
+        }
+        *, .q-btn, .q-card, .q-field__control, .q-menu, .q-dialog__inner > div {
+          border-radius: 0 !important;
         }
         body {
-          background: var(--bg);
+          background: linear-gradient(135deg, var(--bg), #a0006d 48%, #ff6a00);
           color: var(--ink);
           font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
           letter-spacing: 0;
@@ -63,8 +66,8 @@ def apply_theme() -> None:
         .brand-mark {
           width: 36px;
           height: 36px;
-          border-radius: 8px;
-          background: linear-gradient(135deg, var(--ink), var(--accent));
+          border-radius: 0;
+          background: linear-gradient(135deg, var(--accent), var(--accent-2));
         }
         .brand-title {
           font-weight: 800;
@@ -87,7 +90,7 @@ def apply_theme() -> None:
         .surface {
           background: var(--surface);
           border: 1px solid var(--line);
-          border-radius: 8px;
+          border-radius: 0;
           box-shadow: 0 16px 38px rgba(17, 24, 39, 0.06);
         }
         .section-pad {
@@ -130,13 +133,13 @@ def apply_theme() -> None:
           overflow: hidden;
           background: var(--surface);
           border: 1px solid var(--line);
-          border-radius: 8px;
+          border-radius: 0;
           min-height: 100%;
         }
         .product-image {
           width: 100%;
-          aspect-ratio: 4 / 3;
-          object-fit: cover;
+          aspect-ratio: 1 / 1;
+          object-fit: contain;
           background: var(--surface-2);
         }
         .product-body {
@@ -159,7 +162,7 @@ def apply_theme() -> None:
         }
         .pill {
           border: 1px solid var(--line);
-          border-radius: 999px;
+          border-radius: 0;
           padding: 3px 8px;
           font-size: 0.78rem;
           color: var(--muted);
@@ -179,14 +182,14 @@ def apply_theme() -> None:
         }
         .empty-state {
           border: 1px dashed var(--line);
-          border-radius: 8px;
+          border-radius: 0;
           padding: 28px;
           color: var(--muted);
           background: var(--surface);
         }
         .skeleton {
           height: 96px;
-          border-radius: 8px;
+          border-radius: 0;
           background: linear-gradient(90deg, var(--surface-2), var(--surface), var(--surface-2));
           background-size: 200% 100%;
           animation: shimmer 1.4s infinite;

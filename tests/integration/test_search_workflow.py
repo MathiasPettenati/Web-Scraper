@@ -89,7 +89,8 @@ async def test_requested_brand_catalog_product_flows_through_search(db_session) 
     product = await db_session.get(Product, results[0].product_id)
     assert product.brand == "Burberry"
     assert product.deal_score > 0
-    assert product.product_url.startswith("https://www.google.com/search?tbm=shop&q=")
+    assert product.product_url.startswith("/api/catalog-products/")
+    assert "google.com/search" not in product.product_url
 
 
 async def test_default_deal_feed_returns_many_good_deals(db_session) -> None:
@@ -107,7 +108,7 @@ async def test_default_deal_feed_returns_many_good_deals(db_session) -> None:
         )
     ).all()
     assert refreshed.status == "completed"
-    assert refreshed.products_found >= 1300
-    assert len(results) >= 1300
+    assert refreshed.products_found >= 1600
+    assert len(results) >= 1600
     assert results[0].deal_score >= results[-1].deal_score
     assert any(item["label"] == "Total price vs comparable median" for item in results[0].score_explanation)
