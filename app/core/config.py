@@ -20,9 +20,7 @@ class Settings(BaseSettings):
     secret_key: str = "change-me-in-production"
     admin_token: str = "change-me-admin-token"
 
-    database_url: str = Field(
-        default="postgresql+asyncpg://garment:garment@localhost:5432/garment_deals"
-    )
+    database_url: str = Field(default="sqlite+aiosqlite:///./garment_deals.sqlite3")
     redis_url: str = "redis://localhost:6379/0"
     use_celery: bool = False
     auto_create_tables: bool = True
